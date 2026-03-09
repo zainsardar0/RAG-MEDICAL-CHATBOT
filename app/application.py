@@ -1,10 +1,16 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from app.components.retriever import create_qa_chain
+from app.components.pdf_loader import load_pdf_files, create_text_chunks
+from app.components.vector_store import save_vector_store
+from app.config.config import DB_FAISS_PATH
+from app.common.logger import get_logger
 from dotenv import load_dotenv
 from markupsafe import Markup
 import os
 
-load_dotenv()  # ✅ Only once
+load_dotenv()
+
+logger = get_logger(__name__)
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -14,6 +20,23 @@ def nl2br(value):
     return Markup(value.replace("\n", "<br>\n"))
 
 app.jinja_env.filters['nl2br'] = nl2br
+
+# ✅ Auto-generate vectorstore if not exists
+def initialize_vectorstore():
+    if not os.path.exists(DB_FAISS_PATH):
+        logger.info("Vectorstore not found — generating from PDFs...")
+        try:
+            documents = load_pdf_files()
+            if documents:
+                chunks = create_text_chunks(documents)
+                save_vector_store(chunks)
+                logger.info("Vectorstore generated successfully!")
+            else:
+                logger.warning("No PDFs found in data folder!")
+        except Exception as e:
+            logger.error(f"Failed to generate vectorstore: {str(e)}")
+    else:
+        logger.info("Vectorstore already exists — skipping generation!")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -61,4 +84,5 @@ def clear():
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
+    initialize_vectorstore()  # ✅ Auto-generate vectorstore on startup
     app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)

@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.git/
+*.md
+custom_jenkins/
+.gitignore
+logs/
+build/
+*.egg-info/
