@@ -20,7 +20,7 @@ COPY requirements-docker.txt .
 ## Install torch CPU version first separately
 RUN pip install --no-cache-dir \
     --extra-index-url https://download.pytorch.org/whl/cpu \
-    torch==2.1.0+cpu
+    torch==2.5.1+cpu
 
 ## Install remaining dependencies using docker requirements
 RUN pip install --no-cache-dir -r requirements-docker.txt
