@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix  # ✅ Add this
 from app.components.retriever import create_qa_chain
 from app.components.pdf_loader import load_pdf_files, create_text_chunks
 from app.components.vector_store import save_vector_store
@@ -13,6 +14,7 @@ load_dotenv()
 logger = get_logger(__name__)
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1) 
 app.secret_key = os.environ.get("SECRET_KEY", "medicalragchatbot2024xyzkey")  # ✅ Fixed
 
 # nl2br filter
