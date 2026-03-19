@@ -318,26 +318,6 @@ wsl --shutdown
 
 ---
 
-## ☁️ AWS Deployment
-
-### AWS Services Used
-
-| Service | Purpose |
-|---|---|
-| **ECR** | Container registry to store Docker images |
-| **App Runner** | Fully managed service to run containers |
-
-### Deployment Configuration
-
-| Variable | Value |
-|---|---|
-| `AWS_REGION` | `ap-southeast-2` |
-| `ECR_REPO` | `my-repo` |
-| `SERVICE_NAME` | `llmops-medical-service` |
-| `IMAGE_TAG` | `latest` |
-
----
-
 ## 🔍 How RAG Works in This Project
 
 ```
@@ -408,4 +388,4 @@ result = qa_chain.invoke(user_question)
 
 ## 📄 License
 
-This project is for educational purposes as part of an LLMOps course.
+This project is open source and available under the MIT License.
