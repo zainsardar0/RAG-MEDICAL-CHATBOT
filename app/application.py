@@ -13,7 +13,7 @@ load_dotenv()
 logger = get_logger(__name__)
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ.get("SECRET_KEY", "medicalragchatbot2024xyzkey")  # ✅ Fixed
 
 # nl2br filter
 def nl2br(value):
