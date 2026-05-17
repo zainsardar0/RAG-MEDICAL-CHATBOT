@@ -8,9 +8,9 @@ pinned: false
 app_port: 5000
 ---
 
-# 🏥 RAG Medical Chatbot — LLMOps End-to-End Project
+# 🏥 RAG Medical Chatbot
 
-A production-ready Medical Question Answering chatbot built using Retrieval-Augmented Generation (RAG), deployed with a complete MLOps pipeline including CI/CD, containerization, security scanning, and cloud deployment.
+An AI-powered medical question-answering chatbot built with Retrieval-Augmented Generation (RAG). The application loads medical PDF documents, converts them into searchable vector embeddings, retrieves relevant context for a user question, and generates a concise answer using an LLM.
 
 🚀 **Live Demo:** [https://huggingface.co/spaces/zainsardar/rag-medical-chatbot](https://huggingface.co/spaces/zainsardar/rag-medical-chatbot)
 
@@ -18,39 +18,50 @@ A production-ready Medical Question Answering chatbot built using Retrieval-Augm
 
 ## 📌 Project Overview
 
-This project demonstrates an end-to-end LLMOps workflow where medical PDF documents are loaded, chunked, embedded into a FAISS vector store, and retrieved at query time to generate accurate answers using a Large Language Model (LLaMA3 via Groq API).
+RAG Medical Chatbot is a document-based medical assistant that answers questions from the medical PDFs available in the project. Instead of relying only on the LLM's general knowledge, the system first searches the medical document collection and then uses the retrieved context to generate a response.
+
+The goal of this project is to demonstrate a practical RAG pipeline using LangChain, FAISS, HuggingFace embeddings, Groq LLMs, Flask, and Docker.
+
+> ⚠️ **Medical Disclaimer:** This project is for educational and portfolio purposes only. It is not a replacement for professional medical advice, diagnosis, or treatment.
 
 ---
 
-## 🏗️ Architecture
+## ✨ Features
+
+- Medical PDF document loading
+- Text chunking for long documents
+- HuggingFace embedding generation
+- FAISS-based semantic search
+- LangChain LCEL-based RAG chain
+- Groq LLaMA3 model integration
+- Flask web interface
+- Chat-style user interface
+- Custom logging and exception handling
+- Environment-based configuration
+- Dockerized application setup
+
+---
+
+## 🏗️ System Architecture
 
 ```
-User Query
+Medical PDFs
     ↓
-Flask Web App (Frontend + Backend)
+PDF Loader
     ↓
-Retriever (LangChain LCEL Chain)
+Text Chunking
     ↓
-FAISS Vector Store ←── Medical PDFs (chunked + embedded)
+HuggingFace Embeddings
     ↓
-Groq API (LLaMA3 8B)
+FAISS Vector Store
     ↓
-Answer returned to User
-```
-
-### CI/CD Pipeline
-```
-GitHub Push
+User Question → Retriever → Relevant Context
     ↓
-Jenkins Pipeline
+Prompt + Groq LLaMA3
     ↓
-Docker Build
+Generated Answer
     ↓
-Aqua Trivy Security Scan
-    ↓
-Push to AWS ECR
-    ↓
-Deploy to AWS App Runner
+Flask Web Interface
 ```
 
 ---
@@ -59,63 +70,56 @@ Deploy to AWS App Runner
 
 | Category | Technology |
 |---|---|
-| **Embedding Model** | `sentence-transformers/all-MiniLM-L6-v2` (HuggingFace) |
-| **Vector Store** | FAISS (Meta) — local CPU |
-| **RAG Framework** | LangChain 1.x (LCEL style) |
-| **LLM Provider** | Groq API + LLaMA3 (`llama-3.1-8b-instant`) |
-| **PDF Loader** | PyPDF + LangChain DirectoryLoader |
-| **Backend** | Flask 3.x |
-| **Frontend** | HTML / CSS / JavaScript |
-| **Containerization** | Docker |
-| **Security Scanning** | Aqua Trivy |
-| **CI/CD** | Jenkins |
-| **Container Registry** | AWS ECR |
-| **Cloud Deployment** | AWS App Runner + HuggingFace Spaces |
-| **Source Control** | GitHub |
+| Embedding Model | `sentence-transformers/all-MiniLM-L6-v2` |
+| Vector Store | FAISS |
+| RAG Framework | LangChain LCEL |
+| LLM Provider | Groq API + LLaMA3 |
+| PDF Processing | PyPDF + LangChain DirectoryLoader |
+| Backend | Flask |
+| Frontend | HTML, CSS, JavaScript |
+| Containerization | Docker |
+| Configuration | Python Dotenv |
+| Source Control | GitHub |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-RAG MEDICAL CHATBOT/
+RAG-MEDICAL-CHATBOT/
 ├── app/
 │   ├── common/
 │   │   ├── logger.py              # Custom logger
 │   │   └── custom_exception.py    # Custom exception handler
 │   ├── components/
-│   │   ├── pdf_loader.py          # PDF loading + text chunking
-│   │   ├── embeddings.py          # HuggingFace embeddings
-│   │   ├── vector_store.py        # FAISS vector store
-│   │   ├── retriever.py           # LangChain LCEL QA chain
+│   │   ├── pdf_loader.py          # PDF loading and text chunking
+│   │   ├── embeddings.py          # HuggingFace embedding model
+│   │   ├── vector_store.py        # FAISS vector store save/load logic
+│   │   ├── retriever.py           # LangChain LCEL RAG chain
 │   │   ├── llm.py                 # Groq LLM setup
-│   │   └── data_loader.py         # Combines loader, embeddings & vector store
+│   │   └── data_loader.py         # Data ingestion helper
 │   ├── config/
-│   │   └── config.py              # All configuration variables
+│   │   └── config.py              # Project configuration
 │   ├── templates/
-│   │   └── index.html             # Frontend UI
+│   │   └── index.html             # Web UI template
 │   └── application.py             # Flask app entry point
-├── custom_jenkins/
-│   └── Dockerfile                 # Custom Jenkins with Docker installed
 ├── data/                          # Medical PDF files
-├── vectorstore/                   # FAISS index files
+├── vectorstore/                   # Local FAISS index files
 ├── logs/                          # Application logs
-├── .env                           # API keys (never commit!)
-├── .dockerignore                  # Docker build exclusions
-├── .gitattributes                 # Git LFS tracking config
+├── .env                           # Local environment variables, not committed
+├── .dockerignore                  # Docker exclusions
 ├── .gitignore                     # Git exclusions
-├── Dockerfile                     # App Docker image
-├── Jenkinsfile                    # CI/CD pipeline definition
-├── requirements.txt               # Local development dependencies
-├── requirements-docker.txt        # Docker deployment dependencies (CPU torch)
+├── Dockerfile                     # Docker image definition
+├── requirements.txt               # Local dependencies
+├── requirements-docker.txt        # Docker dependencies
 └── setup.py                       # Package setup
 ```
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ Environment Variables
 
-### Environment Variables (`.env`)
+Create a `.env` file in the root directory:
 
 ```env
 HF_TOKEN=your_huggingface_token_here
@@ -124,230 +128,124 @@ GROQ_API_KEY=your_groq_api_key_here
 SECRET_KEY=your_flask_secret_key_here
 ```
 
-Get your API keys:
-- **HuggingFace Token** → https://huggingface.co/settings/tokens
-- **Groq API Key** → https://console.groq.com
+Optional configuration values:
 
-### Config Variables (`app/config/config.py`)
-
-| Variable | Value | Description |
-|---|---|---|
-| `GROQ_API_KEY` | from `.env` | Groq API key |
-| `HF_TOKEN` | from `.env` | HuggingFace token |
-| `DB_FAISS_PATH` | `vectorstore/db_faiss` | FAISS index path |
-| `DATA_PATH` | `data/` | PDF files directory |
-| `CHUNK_SIZE` | `500` | Text chunk size |
-| `CHUNK_OVERLAP` | `50` | Chunk overlap size |
+```env
+DATA_PATH=data/
+DB_FAISS_PATH=vectorstore/db_faiss
+CHUNK_SIZE=500
+CHUNK_OVERLAP=50
+RETRIEVER_K=3
+```
 
 ---
 
-## 🚀 Local Installation & Setup
+## 🚀 Local Installation
 
-### Step 1 — Clone the repository
+### 1. Clone the repository
+
 ```bash
 git clone https://github.com/zainsardar0/RAG-MEDICAL-CHATBOT.git
 cd RAG-MEDICAL-CHATBOT
 ```
 
-### Step 2 — Create virtual environment
+### 2. Create and activate a virtual environment
+
 ```bash
 python -m venv venv
 ```
 
-### Step 3 — Activate virtual environment
-```bash
-# Windows
-venv\Scripts\activate
+Windows:
 
-# Linux/Mac
+```bash
+venv\Scripts\activate
+```
+
+Linux/Mac:
+
+```bash
 source venv/bin/activate
 ```
 
-### Step 4 — Install dependencies
+### 3. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 pip install -e .
 ```
 
-### Step 5 — Set up environment variables
-Create a `.env` file in the root directory:
-```env
-HF_TOKEN=your_huggingface_token_here
-HUGGINGFACEHUB_API_TOKEN=your_huggingface_token_here
-GROQ_API_KEY=your_groq_api_key_here
-SECRET_KEY=your_flask_secret_key
-```
+### 4. Add environment variables
 
-### Step 6 — Run the application
+Create a `.env` file and add your API keys.
+
+### 5. Run the app
+
 ```bash
 python app/application.py
 ```
 
-The app will automatically:
-1. Check if vectorstore exists
-2. If not — load PDFs, create embeddings, save FAISS index
-3. Start Flask server at `http://localhost:5000`
+Open the app at:
+
+```text
+http://localhost:5000
+```
+
+When the app starts, it checks whether the FAISS vector store already exists. If it does not exist, the app loads PDFs from the `data/` folder, creates chunks, generates embeddings, and saves the FAISS index locally.
 
 ---
 
 ## 🐳 Docker Setup
 
-### Build the Docker image locally
+### Build the Docker image
+
 ```bash
 docker build -t rag-medical-chatbot:latest .
 ```
 
-### Run the container
+### Run the Docker container
+
 ```bash
 docker run -p 5000:5000 \
-  -e GROQ_API_KEY=your_key \
-  -e HF_TOKEN=your_token \
+  -e GROQ_API_KEY=your_groq_api_key \
+  -e HF_TOKEN=your_huggingface_token \
+  -e HUGGINGFACEHUB_API_TOKEN=your_huggingface_token \
+  -e SECRET_KEY=your_flask_secret_key \
   rag-medical-chatbot:latest
 ```
 
-### Note on Docker requirements
-The project uses two separate requirements files:
+Then open:
 
-| File | Used For | Torch Version |
-|---|---|---|
-| `requirements.txt` | Local development | Full torch (from venv) |
-| `requirements-docker.txt` | Docker deployment | `torch==2.5.1+cpu` (lighter) |
-
-This reduces Docker image size significantly by using CPU-only PyTorch.
-
----
-
-## 🤗 HuggingFace Spaces Deployment
-
-The app is deployed on HuggingFace Spaces using Docker SDK.
-
-### Steps to deploy on HuggingFace Spaces:
-
-**Step 1 — Create a new Space:**
-- Go to https://huggingface.co/spaces
-- Click `New Space`
-- SDK: `Docker`
-- Visibility: `Public`
-
-**Step 2 — Install Git LFS:**
-```bash
-git lfs install
-git lfs track "*.pdf"
-git lfs track "*.faiss"
-git lfs track "*.pkl"
-git add .gitattributes
-git commit -m "feat: add git lfs tracking"
-```
-
-**Step 3 — Add HF Space as remote and push:**
-```bash
-git remote add space https://huggingface.co/spaces/YOUR_USERNAME/YOUR_SPACE_NAME
-git push space main --force
-```
-
-**Step 4 — Add Secrets in Space Settings:**
-
-| Secret Name | Description |
-|---|---|
-| `GROQ_API_KEY` | Your Groq API key |
-| `HF_TOKEN` | Your HuggingFace token |
-| `HUGGINGFACEHUB_API_TOKEN` | Your HuggingFace token |
-| `SECRET_KEY` | Flask session secret key |
-
----
-
-## 🔧 Jenkins CI/CD Pipeline
-
-### Jenkins Setup (Custom Docker Image)
-
-```bash
-# Build custom Jenkins image
-cd custom_jenkins
-docker build -t jenkins-dind:latest .
-
-# Run Jenkins container
-docker run -d \
-  --name jenkins-dind \
-  --privileged \
-  -p 8080:8080 \
-  -p 50000:50000 \
-  jenkins-dind:latest
-```
-
-### After every Jenkins restart
-```bash
-docker exec -u root -it jenkins-dind chmod 666 /var/run/docker.sock
-```
-
-### Pipeline Stages
-
-```
-Stage 1: Clone GitHub Repo
-    ↓
-Stage 2: Build Docker Image
-    ↓
-Stage 3: Trivy Security Scan
-    ↓
-Stage 4: Push to AWS ECR
-    ↓
-Stage 5: Deploy to AWS App Runner (optional)
-```
-
-### Jenkins Credentials Required
-
-| Credential ID | Type | Purpose |
-|---|---|---|
-| `github-token` | Secret text | GitHub personal access token |
-| `aws-token` | AWS credentials | AWS access key + secret key |
-
-### WSL2 Memory Configuration (Windows)
-
-To prevent Docker Desktop crashes during large builds, create `C:\Users\USERNAME\.wslconfig`:
-
-```ini
-[wsl2]
-memory=6GB
-processors=4
-swap=2GB
-```
-
-Then run:
-```bash
-wsl --shutdown
+```text
+http://localhost:5000
 ```
 
 ---
 
 ## 🔍 How RAG Works in This Project
 
-```
-1. PDF Loading
-   └── DirectoryLoader loads all PDFs from data/ folder
+1. **PDF Loading**  
+   Medical PDFs are loaded from the `data/` directory.
 
-2. Text Chunking
-   └── RecursiveCharacterTextSplitter
-       ├── chunk_size = 500
-       └── chunk_overlap = 50
+2. **Text Chunking**  
+   Long PDF text is split into smaller chunks so that relevant sections can be retrieved later.
 
-3. Embeddings
-   └── HuggingFaceEmbeddings
-       └── model: sentence-transformers/all-MiniLM-L6-v2
+3. **Embedding Generation**  
+   Each chunk is converted into a numerical vector using a HuggingFace sentence-transformer model.
 
-4. Vector Store
-   └── FAISS (stored locally at vectorstore/db_faiss)
+4. **Vector Storage**  
+   The vectors are stored in a local FAISS vector database.
 
-5. Retrieval (LCEL Chain)
-   └── User query → FAISS similarity search → Top K chunks
+5. **Semantic Retrieval**  
+   When the user asks a question, FAISS retrieves the most relevant chunks.
 
-6. Answer Generation
-   └── LLaMA3 (via Groq) + retrieved context → Final answer
-```
+6. **Answer Generation**  
+   The retrieved context and user question are passed to a Groq-hosted LLaMA3 model to generate the final answer.
 
 ---
 
 ## 🔄 LangChain LCEL Chain
 
-This project uses the modern LangChain LCEL style instead of the deprecated `RetrievalQA`:
+The project uses LangChain LCEL to connect the retriever, prompt, LLM, and output parser:
 
 ```python
 qa_chain = (
@@ -356,31 +254,42 @@ qa_chain = (
     | llm
     | StrOutputParser()
 )
-
-# Usage - returns plain string
-result = qa_chain.invoke(user_question)
 ```
 
 ---
 
-## 📦 Key Package Versions
+## 🧠 What I Learned
 
-| Package | Version |
-|---|---|
-| `langchain` | 1.2.10 |
-| `langchain_community` | 0.4.1 |
-| `langchain_huggingface` | 1.2.1 |
-| `langchain_groq` | 1.1.2 |
-| `faiss-cpu` | 1.13.2 |
-| `flask` | 3.1.3 |
-| `sentence-transformers` | 5.2.3 |
-| `torch` | 2.10.0 (local) / 2.5.1+cpu (Docker) |
+Through this project, I practiced:
+
+- Building a document-based RAG system
+- Loading and processing PDF documents
+- Creating embeddings using sentence-transformer models
+- Storing and searching vectors with FAISS
+- Designing prompts for safer medical question answering
+- Connecting an LLM API with a retrieval pipeline
+- Building a Flask-based AI web application
+- Containerizing an AI application with Docker
+
+---
+
+## 🚧 Future Improvements
+
+- Add source citations with PDF name and page number
+- Add user PDF upload support
+- Add chat history memory
+- Add response streaming
+- Add similarity score display for retrieved chunks
+- Add basic test cases
+- Add a FastAPI version of the backend
+- Improve UI design
 
 ---
 
 ## 👤 Author
 
 **Muhammad Zain Ul Abideen**
+
 - GitHub: [@zainsardar0](https://github.com/zainsardar0)
 - HuggingFace: [@zainsardar](https://huggingface.co/zainsardar)
 
